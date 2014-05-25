@@ -1,4 +1,6 @@
 from dis import findlabels, findlinestarts
+from opcode import *
+from opcode import __all__ as _opcodes_all
 
 def disassemble(co, lasti=-1):
     """Disassemble a code object."""

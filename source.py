@@ -19,9 +19,6 @@ codestring = c
 ___ = build(codestring)
 
 try:
-    from opcode import *
-    from opcode import __all__ as _opcodes_all
-
     co = ___.func_code
     disassemble(co)
 except Exception as e:
