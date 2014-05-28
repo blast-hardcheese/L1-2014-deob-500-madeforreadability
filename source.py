@@ -1,6 +1,8 @@
 import sys
+import dis
+#import uncompyle2
 
-from shiftops import replace, shift_ops
+from shiftops import replace, shift_ops, strip_nops, revmap
 from mydis import disassemble
 
 import hashlib
@@ -22,22 +24,22 @@ def build(codestring):
     names = ('hashlib','md5','update','___','func_code','co_code','digest','exit','join','range','sum','chr','math','__builtins__','raw_input','int','upper','round','sqrt','map','str','lower','ord','zfill','len','sys')
     varnames = (
     'hashlib',
-    '',
-    '',
-    '',
+    'hobj',
+    'var3',
+    'var4',
     'math',
-    '',
-    '',
-    '',
-    '',
-    '',
+    'var6',
+    'chr',
+    'var8',
+    'var9',
+    'var10',
     'map',
     'str',
     'eval',
     'int'
     )
     filename = 'asdf'
-    name = 'module name?'
+    name = 'asdfmodule'
     firstlineno = 1
     lnotab = '\x00\x01'
 
@@ -48,18 +50,66 @@ def build(codestring):
 codestring = open('co_code').read().strip()
 
 c = codestring
+
+c = replace(c,   3, '\x09')
+
 c = replace(c,   4, '\x09'*2)  # Jump fix
 c = replace(c,  80, '\x09'*3)  # Jump fix
 c = replace(c, 178, '\x09'*3)  # Jump fix
 c = replace(c, 220, '\x09'*3)  # Jump fix
-codestring = c
+c = replace(c, 451, '\x09')    # Jump fix
 
-#codestring = shift_ops(codestring, 375, 10)
+c = replace(c, 223, '\x09'*3)  # Disabling try: catch
+c = replace(c, 371, '\x09')    # Disabling try: catch
+c = replace(c, 375, '\x09'*3)  # Disabling try: catch
+
+c = replace(c, 736, '\x03')   # Changing comparison to print "Winner"
+
+## Cleanup
+#c = replace(c,  0, '\x09'*4)
+#c = replace(c, 18, '\x09'*3)
+#c = replace(c, 21, '\x09'*3)
+#c = replace(c, 24, '\x09'*3)
+#c = replace(c, 27, '\x09'*3)
+#c = replace(c, 30, '\x09'*3)
+#c = replace(c, 33, '\x09'*3)
+#c = replace(c, 36, '\x09'*3)
+#c = replace(c, 39, '\x09'*3)
+#c = replace(c, 42, '\x09'*3)
+#c = replace(c, 45, '\x09'*3)
+#c = replace(c, 48, '\x09')
+#c = replace(c, 49, '\x09'*3)
+#c = replace(c, 52, '\x09'*3)
+#c = replace(c, 55, '\x09'*3)
+#c = replace(c, 58, '\x09'*3)
+#c = replace(c, 61, '\x09'*3)
+#c = replace(c, 64, '\x09'*13)
+#c = replace(c, 77, '\x09'*3)
+
+#c = strip_nops(c)
+
+c = shift_ops(c, 734, 20)
+c = replace(c, 735, chr(dis.opmap['PRINT_ITEM']))
+
+codestring = c
 
 ___ = build(codestring)
 
+co = ___.func_code
+
+print "Here"
+from StringIO import StringIO
+out = StringIO()
+
+if True:
+    #uncompyle2.uncompyle('2.7', co, out=out)
+
+    out.seek(0)
+    print out.read()
+    print "There"
+
 try:
-    co = ___.func_code
+
     disassemble(co)
 except Exception as e:
     print e

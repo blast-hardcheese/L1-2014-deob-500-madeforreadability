@@ -35,3 +35,20 @@ def shift_ops(codestring, start, count, limit=True):
 
 def replace(c, i, s):
     return c[:i] + s + c[i + len(s):]
+
+def strip_nops(codestring):
+    i = 0
+
+    while i < len(codestring):
+        op = ord(codestring[i])
+        i += 1
+
+        if op is 9:
+            i -= 1
+            codestring = codestring[:i] + codestring[i+1:]
+        elif op in dis.hasjabs:
+            i += 2
+        elif op > dis.HAVE_ARGUMENT:
+            i += 2
+
+    return codestring
