@@ -538,7 +538,25 @@ Code sync break
     dis(___)
     ___()
 
-Looking at the disassembly, we can make out a lot of different kinds of things going on. Fortunately, we don't care about most of this, we just care about the result. One way to short-cut all the reversing and decompilation is to find critical parts of the codebase and insert PRINT_ITEM statements:
+Looking at the disassembly, we can make out a lot of different kinds of things going on. Fortunately, we don't care about most of this, we just care about the result. One way to short-cut all the reversing and decompilation is to find critical parts of the codebase and insert `PRINT_ITEM` statements.
+
+                716 LOAD_ATTR               16 (upper)
+                719 CALL_FUNCTION            0
+                722 CALL_FUNCTION            1
+                725 BUILD_LIST               4
+                728 CALL_FUNCTION            2
+                731 CALL_FUNCTION            1
+                734 BINARY_ADD          
+                735 COMPARE_OP               2 (==)
+                738 POP_JUMP_IF_FALSE      879
+                741 LOAD_GLOBAL             11 (chr)
+                744 LOAD_GLOBAL             22 (ord)
+                747 LOAD_CONST              30 ('w')
+                750 CALL_FUNCTION            1
+                753 LOAD_CONST              31 (32)
+                756 BINARY_SUBTRACT     
+
+Close to the end of the disassembly, we find a `COMPARE_OP`. This looks promising, since comparison operates on the top two positions on the stack. We might get lucky, since we suspect this code gets input and compares it against the password. By replacing offsets 735 and 736 with `PRINT_ITEM`, we can expect two things from the stack to be printed, probably after we enter our guess password:
 
     c = codestring
 
